@@ -1,0 +1,20 @@
+# created by virtualenv automatically
+src/test.py
+# PyCharm 缓存目录标记
+src/CACHEDIR.TAG
+
+# Python 虚拟环境配置
+src/pyvenv.cfg
+venv/
+.venv/
+
+
+src/__pycache__/
+*.pyc
+*.pyo
+
+dist/
+build/
+main.spec
+
+.idea/
