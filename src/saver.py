@@ -1,9 +1,5 @@
 import os
 from pathlib import Path
-from logger import logger
-
-
-logger.info("程序启动")
 
 
 class VideoSaver:

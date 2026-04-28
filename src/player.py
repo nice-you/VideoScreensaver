@@ -2,11 +2,7 @@ import ctypes, cv2, numpy, pygame, asyncio, socket
 from saver import VideoSaver
 from fetcher import get_video_info
 from pathlib import Path
-from bg_manager import BackgroundManager
 from logger import logger
-
-
-logger.info("程序启动")
 
 
 def is_online(host="8.8.8.8", port=53, timeout=3):
@@ -136,6 +132,7 @@ class Player:
         return False
 
     async def get_info(self):
+        """获取视频信息"""
         try:
             info = await get_video_info(self.bvid)
             self.title = info.get('title', "无标题")
@@ -158,16 +155,19 @@ class Player:
         screen.fill((230, 240, 240))
         pygame.display.set_caption("7981屏保")
         self.update_background(True)
+        print("创建屏保窗口")
+        logger.info("创建屏保窗口")
         return screen
 
     @staticmethod
     def close_window():
         """关闭窗口"""
-        print("窗口关闭")
-        logger.info("窗口关闭")
+        print("屏保窗口关闭")
+        logger.info("屏保窗口关闭")
         pygame.display.quit()
 
     def change_video(self):
+        """换到下一个视频"""
         # 释放当前视频资源
         if hasattr(self, 'video') and self.video:
             self.video.release()
@@ -183,8 +183,18 @@ class Player:
         # 根据网络状态决定删除还是循环
         if is_online():
             # 有网：删除当前视频文件（淘汰旧视频）
-            if self.video_m4s_path and self.video_m4s_path.exists():
-                self.video_m4s_path.unlink()
+            if self.video_m4s_path and self.video_m4s_path.exists() and self.video_m4s_path.is_file():
+                try:
+                    self.video_m4s_path.unlink()
+                    print(f"已删除已播放视频: {self.video_m4s_path.name}")
+                    logger.info(f"已删除已播放视频: {self.video_m4s_path.name}")
+                except OSError as e:
+                    print(f"删除失败: {e}")
+                    logger.error(f"删除失败: {e}")
+            else:
+                print(f"警告: 无效的视频路径 {self.video_m4s_path}，跳过删除")
+                logger.warning(f"警告: 无效的视频路径 {self.video_m4s_path}，跳过删除")
+
             # 重新获取列表，现在最旧的就是原来的第二个
             remaining = sorted(Path("cache").glob("*.m4s"), key=lambda p: p.stat().st_mtime)
             if not remaining:
@@ -233,6 +243,7 @@ class Player:
         self.current_frame = target_frame
 
     def update_background(self, is_now=False):
+        """更新屏保图片"""
         now = pygame.time.get_ticks()
         if is_now or now - self.last_update_bg >= 30 * 1000:
             # 从 BackgroundManager 获取一张随机图片路径
@@ -255,6 +266,7 @@ class Player:
             self.last_update_bg = now
 
     def _init_from_video_path(self, video_path):
+        """初始化视频"""
         self.video_m4s_path = video_path
         self.bvid = self.video_m4s_path.stem
         asyncio.run(self.get_info())
@@ -278,8 +290,9 @@ class Player:
         self.video_rect.center = self.v_bg_rect.center
 
 
+"""
 if __name__ == '__main__':
-    bg_m = BackgroundManager(bg_dir=Path(__file__).parent / "backgrounds",
+    bg_m = BackgroundManager(,
     max_images=20,
     min_trigger=5,
     check_interval=3600     # 1小时检查一次
@@ -297,3 +310,4 @@ if __name__ == '__main__':
             y = (player.screen_height - player.display_height) // 2
             _screen.blit(player.frame, (x, y))
             pygame.display.flip()
+"""

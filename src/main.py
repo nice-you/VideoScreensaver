@@ -85,8 +85,6 @@ class EventChecker:
         """检查是否有事件（会重置标志）"""
         if self.event_occurred:
             self.event_occurred = False
-            print("有事件发生")
-            logger.info("有事件发生")
             return True
         return False
 
@@ -203,8 +201,8 @@ while running:
                     cache_mgr.stop()
                     running = False
                     window_open = False
-                    print("屏保程序关闭")
-                    logger.info("屏保程序关闭")
+                    print("屏保程序退出")
+                    logger.info("屏保程序退出")
                     pygame.quit()
                     sys.exit()
 

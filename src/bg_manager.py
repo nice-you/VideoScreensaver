@@ -5,9 +5,6 @@ from logger import logger
 from utils import get_bg_dir
 
 
-logger.info("程序启动")
-
-
 class BackgroundManager:
     def __init__(self, max_images=20, min_trigger=5, check_interval=3600):
         """
@@ -65,6 +62,7 @@ class BackgroundManager:
                 try:
                     oldest.unlink()
                     print(f"清理旧背景图: {oldest.name}")
+                    logger.info(f"清理旧背景图: {oldest.name}")
                 except OSError:
                     pass
 
@@ -82,6 +80,7 @@ class BackgroundManager:
                     time.sleep(1)
             except Exception as e:
                 print(f"BackgroundManager 异常: {e}")
+                logger.warning(f"BackgroundManager 异常: {e}")
                 time.sleep(10)
 
     def _download_one_image(self):
@@ -98,15 +97,19 @@ class BackgroundManager:
                 with open(filepath, "wb") as f:
                     f.write(resp.content)
                 print(f"背景图下载成功: {filepath.name}")
+                logger.info(f"背景图下载成功: {filepath.name}")
                 self._refresh_list()
             else:
                 # 非 200 状态码（如 503）静默失败，不打印过多信息
                 pass
         except requests.exceptions.RequestException as e:
+            print(f"网络异常: {e}")
+            logger.warning(f"网络异常: {e}")
             # 网络异常（无网、超时等）静默失败
             pass
         except Exception as e:
             print(f"背景图下载异常: {e}")
+            logger.warning(f"背景图下载异常: {e}")
         finally:
             self._downloading = False
 

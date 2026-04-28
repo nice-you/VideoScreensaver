@@ -2,10 +2,6 @@ import aiohttp, random
 from bilibili_api import video, video_zone, sync
 from bilibili_api.video import VideoQuality
 from saver import VideoSaver
-from logger import logger
-
-
-logger.info("程序启动")
 
 
 headers = {

@@ -6,9 +6,6 @@ from logger import logger
 from utils import get_cache_dir
 
 
-logger.info("程序启动")
-
-
 class CacheManager:
     def __init__(self, max_videos=20, min_trigger=10, check_interval=30):
         """
