@@ -15,6 +15,7 @@ PROGRESS_BAR_COLOR_BG = (60, 60, 60)
 PROGRESS_BAR_COLOR_FG = (80, 150, 200)
 RECOVER_INTERVAL = 2    # 恢复视频模式检测时间
 
+
 cache_mgr = CacheManager(max_videos=20, min_trigger=10, check_interval=30)
 
 # 初始化背景管理器（放在创建 Player 之前或之后都可以）
@@ -199,6 +200,7 @@ while running:
                     player.close_window()
                     event_checker.stop()
                     cache_mgr.stop()
+                    bg_manager.stop()
                     running = False
                     window_open = False
                     print("屏保程序退出")

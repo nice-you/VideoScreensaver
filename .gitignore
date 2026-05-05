@@ -17,4 +17,6 @@ dist/
 build/
 main.spec
 
+/screen_saver.log
+
 .idea/

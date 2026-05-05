@@ -39,6 +39,8 @@ class CacheManager:
         with self._lock:
             files = list(self.cache_dir.glob("*.m4s"))
             files.sort(key=lambda p: p.stat().st_mtime)
+            logger.info(f"_refresh_list: 找到 {len(files)} 个文件: {[f.name for f in files]}")
+            print(f"_refresh_list: 找到 {len(files)} 个文件: {[f.name for f in files]}")
             self._video_list = files
 
     def get_sorted_videos(self) -> List[Path]:
@@ -63,17 +65,18 @@ class CacheManager:
                 self._refresh_list()
 
     def _cleanup_old(self):
-        """如果缓存数量超过 max_videos，删除最旧的（列表头部）"""
         with self._lock:
             while len(self._video_list) > self.max_videos:
                 oldest = self._video_list.pop(0)
-                try:
+                if oldest.exists():
+                    logger.warning(f"CacheManager 正在删除旧视频: {oldest}")
+                    print(f"CacheManager 正在删除旧视频: {oldest}")
                     oldest.unlink()
-                    print(f"清理旧视频: {oldest.name}")
-                    logger.info(f"清理旧视频: {oldest.name}")
-                except OSError as e:
-                    logger.error(f"清理旧视频:OSError:{e}")
-                    pass
+                    logger.warning(f"CacheManager 已删除: {oldest}")
+                    print(f"CacheManager 已删除: {oldest}")
+                else:
+                    logger.warning(f"CacheManager: 旧视频不存在: {oldest}")
+                    print(f"CacheManager: 旧视频不存在: {oldest}")
 
     def _need_more(self) -> bool:
         return self.get_video_count() < self.min_trigger

@@ -1,14 +1,10 @@
 import os
-from pathlib import Path
+from utils import get_cache_dir
 
 
 class VideoSaver:
     def __init__(self):
-        self._root = Path(__file__).parent
-        self._cache_dir = self._root / "cache"
-
-        # 创建缓存文件夹
-        self._cache_dir.mkdir(exist_ok=True)
+        self._cache_dir = get_cache_dir()
 
     def save_video(self, bvid, video):
         """保存视频"""
@@ -28,6 +24,6 @@ class VideoSaver:
 
     def clear(self):
         """清除旧视频"""
-        videos = sorted(self._cache_dir.glob("*.m4s"), key=os.path.getmtime)
+        videos = sorted(self._cache_dir.glob("*.m4s"), key=lambda p: p.stat().st_mtime)
         if videos:
             videos[0].unlink()

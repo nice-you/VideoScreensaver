@@ -1,8 +1,8 @@
 import ctypes, cv2, numpy, pygame, asyncio, socket
 from saver import VideoSaver
 from fetcher import get_video_info
-from pathlib import Path
 from logger import logger
+from utils import get_cache_dir
 
 
 def is_online(host="8.8.8.8", port=53, timeout=3):
@@ -28,10 +28,6 @@ def enable_dpi_awareness():
 enable_dpi_awareness()
 
 saver = VideoSaver()
-
-root = Path(__file__).parent
-bg_dir = root / "backgrounds"
-bg_dir.mkdir(exist_ok=True)
 
 
 class Player:
@@ -174,7 +170,7 @@ class Player:
             cv2.destroyAllWindows()
 
         # 获取当前所有视频列表（按修改时间排序）
-        all_videos = sorted(Path("cache").glob("*.m4s"), key=lambda p: p.stat().st_mtime)
+        all_videos = sorted(get_cache_dir().glob("*.m4s"), key=lambda p: p.stat().st_mtime)
 
         if not all_videos:
             self.has_video = False
@@ -186,17 +182,17 @@ class Player:
             if self.video_m4s_path and self.video_m4s_path.exists() and self.video_m4s_path.is_file():
                 try:
                     self.video_m4s_path.unlink()
-                    print(f"已删除已播放视频: {self.video_m4s_path.name}")
-                    logger.info(f"已删除已播放视频: {self.video_m4s_path.name}")
+                    print(f"player 已删除已播放视频: {self.video_m4s_path.name}")
+                    logger.info(f"player 已删除已播放视频: {self.video_m4s_path.name}")
                 except OSError as e:
-                    print(f"删除失败: {e}")
-                    logger.error(f"删除失败: {e}")
+                    print(f"player 删除失败: {e}")
+                    logger.error(f"player 删除失败: {e}")
             else:
-                print(f"警告: 无效的视频路径 {self.video_m4s_path}，跳过删除")
-                logger.warning(f"警告: 无效的视频路径 {self.video_m4s_path}，跳过删除")
+                print(f"player 警告: 无效的视频路径 {self.video_m4s_path}，跳过删除")
+                logger.warning(f"player 警告: 无效的视频路径 {self.video_m4s_path}，跳过删除")
 
             # 重新获取列表，现在最旧的就是原来的第二个
-            remaining = sorted(Path("cache").glob("*.m4s"), key=lambda p: p.stat().st_mtime)
+            remaining = sorted(get_cache_dir().glob("*.m4s"), key=lambda p: p.stat().st_mtime)
             if not remaining:
                 self.has_video = False
                 return
